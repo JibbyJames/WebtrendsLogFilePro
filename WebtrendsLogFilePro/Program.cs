@@ -8,6 +8,10 @@ namespace WebtrendsLogFilePro
 {
     static class Program
     {
+        // Important Global Variables
+        public static string InputFilePath = "";
+        public static string OutputPath = "";
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
