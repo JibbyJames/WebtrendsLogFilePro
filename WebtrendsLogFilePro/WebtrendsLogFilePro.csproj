@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FieldHeaderNode.cs" />
     <Compile Include="LogFileProForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -54,6 +55,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TriStateTreeView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="LogFileProForm.resx">
       <DependentUpon>LogFileProForm.cs</DependentUpon>
     </EmbeddedResource>
