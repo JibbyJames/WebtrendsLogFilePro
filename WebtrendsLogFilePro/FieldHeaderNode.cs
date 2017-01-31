@@ -9,16 +9,17 @@ namespace WebtrendsLogFilePro
 {
     class FieldHeaderNode : TreeNode
     {
-        // Order in which this node sits in the space delimited log file
-        private int order { get; }
+        // The actual value in the log file
+        public string name { get; set; }
 
-        private string displayName { get; set; }
+        // If I want to put friendly text e.g.: cs-username -> Auth Username
+        public string displayName { get; set; }
 
-        private string name { get; set; }
 
-        public FieldHeaderNode(int order, string name, string displayName) : base(displayName)
+        public FieldHeaderNode(string name, string displayName) : base(displayName)
         {
-            
+            this.name = name;
+            this.displayName = displayName;
         }
     }
 }
