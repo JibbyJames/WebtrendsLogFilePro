@@ -38,7 +38,7 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_help = new System.Windows.Forms.Button();
             this.btn_close = new System.Windows.Forms.Button();
-            this.btn_start = new System.Windows.Forms.Button();
+            this.btn_Start = new System.Windows.Forms.Button();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.tableLayoutPanel5 = new System.Windows.Forms.TableLayoutPanel();
             this.grp_Statistics = new System.Windows.Forms.GroupBox();
@@ -58,10 +58,10 @@ namespace WebtrendsLogFilePro
             this.lbl_Decode = new System.Windows.Forms.Label();
             this.rdio_Decode_0 = new System.Windows.Forms.RadioButton();
             this.lbl_outputDir = new System.Windows.Forms.Label();
-            this.txt_outputDir = new System.Windows.Forms.TextBox();
+            this.txt_OutputDir = new System.Windows.Forms.TextBox();
             this.rdio_Decode_2 = new System.Windows.Forms.RadioButton();
             this.rdio_Decode_1 = new System.Windows.Forms.RadioButton();
-            this.btn_outputDir = new System.Windows.Forms.Button();
+            this.btn_OutputDir = new System.Windows.Forms.Button();
             this.lbl_Quotes = new System.Windows.Forms.Label();
             this.chk_Quotes = new System.Windows.Forms.CheckBox();
             this.grp_ParseProgress = new System.Windows.Forms.GroupBox();
@@ -76,7 +76,6 @@ namespace WebtrendsLogFilePro
             this.btn_Excel = new System.Windows.Forms.Button();
             this.btn_Explorer = new System.Windows.Forms.Button();
             this.tableLayoutPanel8 = new System.Windows.Forms.TableLayoutPanel();
-            this.treeView_fields = new WebtrendsLogFilePro.TriStateTreeView();
             this.grp_AddQueryParams = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel9 = new System.Windows.Forms.TableLayoutPanel();
             this.lbl_addParamsManual = new System.Windows.Forms.Label();
@@ -85,16 +84,17 @@ namespace WebtrendsLogFilePro
             this.btn_FullScan = new System.Windows.Forms.Button();
             this.txt_AddQueryParams = new System.Windows.Forms.TextBox();
             this.btn_AddQueryParams = new System.Windows.Forms.Button();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.grp_InputConfig = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.btn_GzFileDirectory = new System.Windows.Forms.Button();
-            this.btn_singleLogFile = new System.Windows.Forms.Button();
+            this.btn_SingleLogFile = new System.Windows.Forms.Button();
             this.txt_SingleLogFile = new System.Windows.Forms.TextBox();
             this.btn_SevenZip = new System.Windows.Forms.Button();
             this.txt_GzFileDirectory = new System.Windows.Forms.TextBox();
             this.txt_SevenZipFile = new System.Windows.Forms.TextBox();
             this.btn_ExtractLogFiles = new System.Windows.Forms.Button();
-            this.btn_submitSingleLogFile = new System.Windows.Forms.Button();
+            this.btn_SubmitSingleLogFile = new System.Windows.Forms.Button();
+            this.treeView_fields = new WebtrendsLogFilePro.TriStateTreeView();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
@@ -108,7 +108,7 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel8.SuspendLayout();
             this.grp_AddQueryParams.SuspendLayout();
             this.tableLayoutPanel9.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this.grp_InputConfig.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -118,10 +118,10 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel3, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.groupBox1, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.grp_InputConfig, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel1.MinimumSize = new System.Drawing.Size(593, 425);
+            this.tableLayoutPanel1.MinimumSize = new System.Drawing.Size(636, 578);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 4;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 4F));
@@ -140,7 +140,7 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 140F));
             this.tableLayoutPanel3.Controls.Add(this.btn_help, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.btn_close, 3, 0);
-            this.tableLayoutPanel3.Controls.Add(this.btn_start, 2, 0);
+            this.tableLayoutPanel3.Controls.Add(this.btn_Start, 2, 0);
             this.tableLayoutPanel3.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 541);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
@@ -159,6 +159,7 @@ namespace WebtrendsLogFilePro
             this.btn_help.TabIndex = 22;
             this.btn_help.Text = "?";
             this.btn_help.UseVisualStyleBackColor = true;
+            this.btn_help.Click += new System.EventHandler(this.btn_help_Click);
             // 
             // btn_close
             // 
@@ -173,17 +174,17 @@ namespace WebtrendsLogFilePro
             this.btn_close.UseVisualStyleBackColor = true;
             this.btn_close.Click += new System.EventHandler(this.btn_close_Click);
             // 
-            // btn_start
+            // btn_Start
             // 
-            this.btn_start.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_start.Location = new System.Drawing.Point(360, 6);
-            this.btn_start.Margin = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.btn_start.Name = "btn_start";
-            this.btn_start.Size = new System.Drawing.Size(120, 22);
-            this.btn_start.TabIndex = 23;
-            this.btn_start.Text = "Start";
-            this.btn_start.UseVisualStyleBackColor = true;
-            this.btn_start.Click += new System.EventHandler(this.btn_start_Click);
+            this.btn_Start.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_Start.Location = new System.Drawing.Point(360, 6);
+            this.btn_Start.Margin = new System.Windows.Forms.Padding(10, 0, 10, 0);
+            this.btn_Start.Name = "btn_Start";
+            this.btn_Start.Size = new System.Drawing.Size(120, 22);
+            this.btn_Start.TabIndex = 23;
+            this.btn_Start.Text = "Start";
+            this.btn_Start.UseVisualStyleBackColor = true;
+            this.btn_Start.Click += new System.EventHandler(this.btn_start_Click);
             // 
             // tableLayoutPanel4
             // 
@@ -345,10 +346,10 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel6.Controls.Add(this.lbl_Decode, 0, 3);
             this.tableLayoutPanel6.Controls.Add(this.rdio_Decode_0, 1, 3);
             this.tableLayoutPanel6.Controls.Add(this.lbl_outputDir, 0, 0);
-            this.tableLayoutPanel6.Controls.Add(this.txt_outputDir, 1, 0);
+            this.tableLayoutPanel6.Controls.Add(this.txt_OutputDir, 1, 0);
             this.tableLayoutPanel6.Controls.Add(this.rdio_Decode_2, 5, 3);
             this.tableLayoutPanel6.Controls.Add(this.rdio_Decode_1, 3, 3);
-            this.tableLayoutPanel6.Controls.Add(this.btn_outputDir, 6, 0);
+            this.tableLayoutPanel6.Controls.Add(this.btn_OutputDir, 6, 0);
             this.tableLayoutPanel6.Controls.Add(this.lbl_Quotes, 0, 4);
             this.tableLayoutPanel6.Controls.Add(this.chk_Quotes, 1, 4);
             this.tableLayoutPanel6.Location = new System.Drawing.Point(3, 15);
@@ -442,16 +443,16 @@ namespace WebtrendsLogFilePro
             this.lbl_outputDir.TabIndex = 17;
             this.lbl_outputDir.Text = "Directory:";
             // 
-            // txt_outputDir
+            // txt_OutputDir
             // 
-            this.txt_outputDir.AcceptsReturn = true;
-            this.txt_outputDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel6.SetColumnSpan(this.txt_outputDir, 5);
-            this.txt_outputDir.Location = new System.Drawing.Point(87, 3);
-            this.txt_outputDir.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
-            this.txt_outputDir.Name = "txt_outputDir";
-            this.txt_outputDir.Size = new System.Drawing.Size(165, 20);
-            this.txt_outputDir.TabIndex = 9;
+            this.txt_OutputDir.AcceptsReturn = true;
+            this.txt_OutputDir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel6.SetColumnSpan(this.txt_OutputDir, 5);
+            this.txt_OutputDir.Location = new System.Drawing.Point(87, 3);
+            this.txt_OutputDir.Margin = new System.Windows.Forms.Padding(0, 0, 3, 0);
+            this.txt_OutputDir.Name = "txt_OutputDir";
+            this.txt_OutputDir.Size = new System.Drawing.Size(165, 20);
+            this.txt_OutputDir.TabIndex = 9;
             // 
             // rdio_Decode_2
             // 
@@ -479,16 +480,16 @@ namespace WebtrendsLogFilePro
             this.rdio_Decode_1.UseVisualStyleBackColor = true;
             this.rdio_Decode_1.CheckedChanged += new System.EventHandler(this.rdio_Decode_CheckedChanged);
             // 
-            // btn_outputDir
+            // btn_OutputDir
             // 
-            this.btn_outputDir.Location = new System.Drawing.Point(256, 2);
-            this.btn_outputDir.Margin = new System.Windows.Forms.Padding(1, 2, 3, 3);
-            this.btn_outputDir.Name = "btn_outputDir";
-            this.btn_outputDir.Size = new System.Drawing.Size(30, 22);
-            this.btn_outputDir.TabIndex = 10;
-            this.btn_outputDir.Text = "📂";
-            this.btn_outputDir.UseVisualStyleBackColor = true;
-            this.btn_outputDir.Click += new System.EventHandler(this.btn_outputDir_Click);
+            this.btn_OutputDir.Location = new System.Drawing.Point(256, 2);
+            this.btn_OutputDir.Margin = new System.Windows.Forms.Padding(1, 2, 3, 3);
+            this.btn_OutputDir.Name = "btn_OutputDir";
+            this.btn_OutputDir.Size = new System.Drawing.Size(30, 22);
+            this.btn_OutputDir.TabIndex = 10;
+            this.btn_OutputDir.Text = "📂";
+            this.btn_OutputDir.UseVisualStyleBackColor = true;
+            this.btn_OutputDir.Click += new System.EventHandler(this.btn_outputDir_Click);
             // 
             // lbl_Quotes
             // 
@@ -660,26 +661,14 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel8.Size = new System.Drawing.Size(309, 415);
             this.tableLayoutPanel8.TabIndex = 7;
             // 
-            // treeView_fields
-            // 
-            this.treeView_fields.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeView_fields.FullRowSelect = true;
-            this.treeView_fields.Location = new System.Drawing.Point(8, 3);
-            this.treeView_fields.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
-            this.treeView_fields.Name = "treeView_fields";
-            this.treeView_fields.Size = new System.Drawing.Size(298, 325);
-            this.treeView_fields.TabIndex = 8;
-            this.treeView_fields.TriStateStyleProperty = WebtrendsLogFilePro.TriStateTreeView.TriStateStyles.Installer;
-            this.treeView_fields.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView_fields_KeyPress);
-            // 
             // grp_AddQueryParams
             // 
             this.grp_AddQueryParams.Controls.Add(this.tableLayoutPanel9);
             this.grp_AddQueryParams.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grp_AddQueryParams.Location = new System.Drawing.Point(5, 334);
-            this.grp_AddQueryParams.Margin = new System.Windows.Forms.Padding(5, 3, 3, 6);
+            this.grp_AddQueryParams.Location = new System.Drawing.Point(8, 334);
+            this.grp_AddQueryParams.Margin = new System.Windows.Forms.Padding(8, 3, 3, 6);
             this.grp_AddQueryParams.Name = "grp_AddQueryParams";
-            this.grp_AddQueryParams.Size = new System.Drawing.Size(301, 75);
+            this.grp_AddQueryParams.Size = new System.Drawing.Size(298, 75);
             this.grp_AddQueryParams.TabIndex = 3;
             this.grp_AddQueryParams.TabStop = false;
             this.grp_AddQueryParams.Text = "Add Query Parameters";
@@ -693,7 +682,7 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 34F));
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
             this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
-            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 33F));
+            this.tableLayoutPanel9.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 38F));
             this.tableLayoutPanel9.Controls.Add(this.lbl_addParamsManual, 0, 0);
             this.tableLayoutPanel9.Controls.Add(this.lbl_addParamsScan, 0, 1);
             this.tableLayoutPanel9.Controls.Add(this.btn_QuickScan, 1, 1);
@@ -706,7 +695,7 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel9.RowCount = 2;
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel9.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.tableLayoutPanel9.Size = new System.Drawing.Size(295, 56);
+            this.tableLayoutPanel9.Size = new System.Drawing.Size(292, 56);
             this.tableLayoutPanel9.TabIndex = 0;
             // 
             // lbl_addParamsManual
@@ -737,7 +726,7 @@ namespace WebtrendsLogFilePro
             this.btn_QuickScan.Location = new System.Drawing.Point(107, 31);
             this.btn_QuickScan.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.btn_QuickScan.Name = "btn_QuickScan";
-            this.btn_QuickScan.Size = new System.Drawing.Size(93, 22);
+            this.btn_QuickScan.Size = new System.Drawing.Size(89, 22);
             this.btn_QuickScan.TabIndex = 18;
             this.btn_QuickScan.Text = "Quick";
             this.btn_QuickScan.UseVisualStyleBackColor = true;
@@ -747,9 +736,9 @@ namespace WebtrendsLogFilePro
             // 
             this.tableLayoutPanel9.SetColumnSpan(this.btn_FullScan, 3);
             this.btn_FullScan.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btn_FullScan.Location = new System.Drawing.Point(203, 31);
+            this.btn_FullScan.Location = new System.Drawing.Point(199, 31);
             this.btn_FullScan.Name = "btn_FullScan";
-            this.btn_FullScan.Size = new System.Drawing.Size(89, 22);
+            this.btn_FullScan.Size = new System.Drawing.Size(90, 22);
             this.btn_FullScan.TabIndex = 19;
             this.btn_FullScan.Text = "Full";
             this.btn_FullScan.UseVisualStyleBackColor = true;
@@ -763,33 +752,33 @@ namespace WebtrendsLogFilePro
             this.txt_AddQueryParams.Location = new System.Drawing.Point(107, 4);
             this.txt_AddQueryParams.Margin = new System.Windows.Forms.Padding(3, 4, 3, 3);
             this.txt_AddQueryParams.Name = "txt_AddQueryParams";
-            this.txt_AddQueryParams.Size = new System.Drawing.Size(152, 20);
+            this.txt_AddQueryParams.Size = new System.Drawing.Size(144, 20);
             this.txt_AddQueryParams.TabIndex = 16;
             this.txt_AddQueryParams.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txt_AddQueryParams_KeyDown);
             // 
             // btn_AddQueryParams
             // 
             this.btn_AddQueryParams.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.btn_AddQueryParams.Location = new System.Drawing.Point(263, 3);
+            this.btn_AddQueryParams.Location = new System.Drawing.Point(255, 3);
             this.btn_AddQueryParams.Margin = new System.Windows.Forms.Padding(1, 3, 3, 3);
             this.btn_AddQueryParams.Name = "btn_AddQueryParams";
-            this.btn_AddQueryParams.Size = new System.Drawing.Size(29, 22);
+            this.btn_AddQueryParams.Size = new System.Drawing.Size(34, 22);
             this.btn_AddQueryParams.TabIndex = 17;
             this.btn_AddQueryParams.Text = "✓";
             this.btn_AddQueryParams.UseVisualStyleBackColor = true;
             this.btn_AddQueryParams.Click += new System.EventHandler(this.btn_AddQueryParams_Click);
             // 
-            // groupBox1
+            // grp_InputConfig
             // 
-            this.groupBox1.Controls.Add(this.tableLayoutPanel2);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(14, 7);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(14, 3, 16, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(606, 104);
-            this.groupBox1.TabIndex = 3;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Input Config";
+            this.grp_InputConfig.Controls.Add(this.tableLayoutPanel2);
+            this.grp_InputConfig.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.grp_InputConfig.Location = new System.Drawing.Point(14, 7);
+            this.grp_InputConfig.Margin = new System.Windows.Forms.Padding(14, 3, 16, 3);
+            this.grp_InputConfig.Name = "grp_InputConfig";
+            this.grp_InputConfig.Size = new System.Drawing.Size(606, 104);
+            this.grp_InputConfig.TabIndex = 3;
+            this.grp_InputConfig.TabStop = false;
+            this.grp_InputConfig.Text = "Input Config";
             // 
             // tableLayoutPanel2
             // 
@@ -798,13 +787,13 @@ namespace WebtrendsLogFilePro
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 120F));
             this.tableLayoutPanel2.Controls.Add(this.btn_GzFileDirectory, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.btn_singleLogFile, 0, 2);
+            this.tableLayoutPanel2.Controls.Add(this.btn_SingleLogFile, 0, 2);
             this.tableLayoutPanel2.Controls.Add(this.txt_SingleLogFile, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.btn_SevenZip, 0, 1);
             this.tableLayoutPanel2.Controls.Add(this.txt_GzFileDirectory, 1, 0);
             this.tableLayoutPanel2.Controls.Add(this.txt_SevenZipFile, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.btn_ExtractLogFiles, 2, 0);
-            this.tableLayoutPanel2.Controls.Add(this.btn_submitSingleLogFile, 2, 2);
+            this.tableLayoutPanel2.Controls.Add(this.btn_SubmitSingleLogFile, 2, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 16);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
@@ -827,17 +816,17 @@ namespace WebtrendsLogFilePro
             this.btn_GzFileDirectory.UseVisualStyleBackColor = true;
             this.btn_GzFileDirectory.Click += new System.EventHandler(this.btn_GzFileDirectory_Click);
             // 
-            // btn_singleLogFile
+            // btn_SingleLogFile
             // 
-            this.btn_singleLogFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_singleLogFile.Location = new System.Drawing.Point(3, 59);
-            this.btn_singleLogFile.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
-            this.btn_singleLogFile.Name = "btn_singleLogFile";
-            this.btn_singleLogFile.Size = new System.Drawing.Size(117, 22);
-            this.btn_singleLogFile.TabIndex = 5;
-            this.btn_singleLogFile.Text = "Single Log File";
-            this.btn_singleLogFile.UseVisualStyleBackColor = true;
-            this.btn_singleLogFile.Click += new System.EventHandler(this.btn_SingleLogFile_Click);
+            this.btn_SingleLogFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_SingleLogFile.Location = new System.Drawing.Point(3, 59);
+            this.btn_SingleLogFile.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this.btn_SingleLogFile.Name = "btn_SingleLogFile";
+            this.btn_SingleLogFile.Size = new System.Drawing.Size(117, 22);
+            this.btn_SingleLogFile.TabIndex = 5;
+            this.btn_SingleLogFile.Text = "Single Log File";
+            this.btn_SingleLogFile.UseVisualStyleBackColor = true;
+            this.btn_SingleLogFile.Click += new System.EventHandler(this.btn_SingleLogFile_Click);
             // 
             // txt_SingleLogFile
             // 
@@ -895,17 +884,29 @@ namespace WebtrendsLogFilePro
             this.btn_ExtractLogFiles.UseVisualStyleBackColor = true;
             this.btn_ExtractLogFiles.Click += new System.EventHandler(this.btn_ExtractLogFiles_Click);
             // 
-            // btn_submitSingleLogFile
+            // btn_SubmitSingleLogFile
             // 
-            this.btn_submitSingleLogFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.btn_submitSingleLogFile.Location = new System.Drawing.Point(480, 59);
-            this.btn_submitSingleLogFile.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
-            this.btn_submitSingleLogFile.Name = "btn_submitSingleLogFile";
-            this.btn_submitSingleLogFile.Size = new System.Drawing.Size(117, 22);
-            this.btn_submitSingleLogFile.TabIndex = 7;
-            this.btn_submitSingleLogFile.Text = "Submit";
-            this.btn_submitSingleLogFile.UseVisualStyleBackColor = true;
-            this.btn_submitSingleLogFile.Click += new System.EventHandler(this.btn_SubmitSingleLogFile_Click);
+            this.btn_SubmitSingleLogFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.btn_SubmitSingleLogFile.Location = new System.Drawing.Point(480, 59);
+            this.btn_SubmitSingleLogFile.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
+            this.btn_SubmitSingleLogFile.Name = "btn_SubmitSingleLogFile";
+            this.btn_SubmitSingleLogFile.Size = new System.Drawing.Size(117, 22);
+            this.btn_SubmitSingleLogFile.TabIndex = 7;
+            this.btn_SubmitSingleLogFile.Text = "Submit";
+            this.btn_SubmitSingleLogFile.UseVisualStyleBackColor = true;
+            this.btn_SubmitSingleLogFile.Click += new System.EventHandler(this.btn_SubmitSingleLogFile_Click);
+            // 
+            // treeView_fields
+            // 
+            this.treeView_fields.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeView_fields.FullRowSelect = true;
+            this.treeView_fields.Location = new System.Drawing.Point(8, 3);
+            this.treeView_fields.Margin = new System.Windows.Forms.Padding(8, 3, 3, 3);
+            this.treeView_fields.Name = "treeView_fields";
+            this.treeView_fields.Size = new System.Drawing.Size(298, 325);
+            this.treeView_fields.TabIndex = 8;
+            this.treeView_fields.TriStateStyleProperty = WebtrendsLogFilePro.TriStateTreeView.TriStateStyles.Installer;
+            this.treeView_fields.KeyDown += new System.Windows.Forms.KeyEventHandler(this.treeView_fields_KeyPress);
             // 
             // LogFileProForm
             // 
@@ -933,7 +934,7 @@ namespace WebtrendsLogFilePro
             this.grp_AddQueryParams.ResumeLayout(false);
             this.tableLayoutPanel9.ResumeLayout(false);
             this.tableLayoutPanel9.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
+            this.grp_InputConfig.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
             this.ResumeLayout(false);
@@ -945,22 +946,22 @@ namespace WebtrendsLogFilePro
         private TableLayoutPanel tableLayoutPanel1;
         private TableLayoutPanel tableLayoutPanel3;
         private Button btn_close;
-        private Button btn_start;
+        private Button btn_Start;
         private Button btn_help;
         private TableLayoutPanel tableLayoutPanel4;
         private TableLayoutPanel tableLayoutPanel5;
         private TableLayoutPanel tableLayoutPanel8;
         private TriStateTreeView treeView_fields;
-        private GroupBox groupBox1;
+        private GroupBox grp_InputConfig;
         private TableLayoutPanel tableLayoutPanel2;
-        private Button btn_singleLogFile;
+        private Button btn_SingleLogFile;
         private TextBox txt_SingleLogFile;
         private Button btn_GzFileDirectory;
         private Button btn_SevenZip;
         private TextBox txt_GzFileDirectory;
         private TextBox txt_SevenZipFile;
         private Button btn_ExtractLogFiles;
-        private Button btn_submitSingleLogFile;
+        private Button btn_SubmitSingleLogFile;
         private GroupBox grp_AddQueryParams;
         private TableLayoutPanel tableLayoutPanel9;
         private Label lbl_addParamsManual;
@@ -999,8 +1000,8 @@ namespace WebtrendsLogFilePro
         private Button btn_Excel;
         private Button btn_Explorer;
         private Label lbl_outputDir;
-        private TextBox txt_outputDir;
-        private Button btn_outputDir;
+        private TextBox txt_OutputDir;
+        private Button btn_OutputDir;
         private Label lbl_Quotes;
         private CheckBox chk_Quotes;
     }

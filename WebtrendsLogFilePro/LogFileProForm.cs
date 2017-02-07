@@ -53,6 +53,9 @@ namespace WebtrendsLogFilePro
         // Log File Delimiter - Just tab for now
         private string delimiter = "\t";
 
+        // About box form when user clicks "?" button.
+        private AboutBox aboutBox;
+
         #endregion
 
         #region Main Class
@@ -71,6 +74,9 @@ namespace WebtrendsLogFilePro
 
             // Start with Output UI disabled
             SetOutputUIElements(false);
+
+            // Init about box.
+            aboutBox = new AboutBox();
         }
 
         #endregion
@@ -151,6 +157,37 @@ namespace WebtrendsLogFilePro
         }
 
         /// <summary>
+        /// Init Progress box with empty values. Start timer.
+        /// </summary>
+        private void InitProgressBox()
+        {
+            lbl_ParsedRowsValue.Text = "0";
+            lbl_TimeElapsedValue.Text = "00:00:00";
+            lbl_CompletionValue.Text = "0%";
+
+            timer = new Timer();
+            timer.Interval = (50); // 0.05 second
+            timer.Tick += new EventHandler(Timer_Tick);
+
+            stopWatch = new Stopwatch();
+
+            stopWatch.Start();
+            timer.Start();
+        }
+
+        /// <summary>
+        /// Timer for Progress Box tick logic.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            lbl_ParsedRowsValue.Text = parsedLines.ToString();
+            lbl_CompletionValue.Text = ((double)parsedLines / totalRows).ToString("#.##%");
+            lbl_TimeElapsedValue.Text = stopWatch.Elapsed.ToString("hh\\:mm\\:ss");
+        }
+
+        /// <summary>
         /// Resets certain UI components for a new log file.
         /// </summary>
         private void ResetUIForNewFile()
@@ -169,7 +206,7 @@ namespace WebtrendsLogFilePro
         /// <param name="outputDir">The output directory value.</param>
         private void SetOutputDirectory(string outputDir)
         {
-            txt_outputDir.Text = outputDir;
+            txt_OutputDir.Text = outputDir;
             this.outputDir = outputDir;
         }
 
@@ -198,7 +235,7 @@ namespace WebtrendsLogFilePro
             grp_AddQueryParams.Enabled = enabled;
             grp_Statistics.Enabled = enabled;
             grp_ParseProgress.Enabled = enabled;
-            btn_start.Enabled = enabled;
+            btn_Start.Enabled = enabled;
 
             // Hide the open file buttons if we're disabling the output UI.
             if (!enabled) {
@@ -235,6 +272,21 @@ namespace WebtrendsLogFilePro
             SubmitLogFile();
         }
 
+        private void treeView_fields_KeyPress(object sender, KeyEventArgs e)
+        {
+            // if there is a currently selected node
+            var selectedNode = treeView_fields.SelectedNode;
+
+            if (selectedNode != null) {
+                // if the Enter key was pressed
+                if (e.KeyCode == Keys.Enter) {
+                    selectedNode.Checked = !selectedNode.Checked;
+                    e.Handled = true;
+                    e.SuppressKeyPress = true;
+                }
+            }
+        }
+
         private void btn_AddQueryParams_Click(object sender, EventArgs e)
         {
             AddQueryParamsFromUI();
@@ -258,14 +310,39 @@ namespace WebtrendsLogFilePro
             FindAndSetQueryParamFields(FindQueryParamsSpeed.Full, validLogFile);
         }
 
+        private void btn_outputDir_Click(object sender, EventArgs e)
+        {
+            LocateOutputDir();
+        }
+
+        private void rdio_Decode_CheckedChanged(object sender, EventArgs e)
+        {
+            SetDecoder();
+        }
+
+        private void chk_Quotes_CheckedChanged(object sender, EventArgs e)
+        {
+            SetJoinedLogic();
+        }
+
         private void btn_Excel_Click(object sender, EventArgs e)
         {
             OpenLogFileWithExcel();
         }
 
+        private void btn_Explorer_Click(object sender, EventArgs e)
+        {
+            Process.Start(Path.GetDirectoryName(outputFile));
+        }
+
+        private void btn_help_Click(object sender, EventArgs e)
+        {
+            aboutBox.ShowDialog();
+        }
+
         private void btn_start_Click(object sender, EventArgs e)
         {
-            StartParsingProcess();
+            BuildOutputFile();
         }
 
         private void btn_close_Click(object sender, EventArgs e)
@@ -423,6 +500,9 @@ namespace WebtrendsLogFilePro
             extractorWorker.Dispose();
         }
 
+        /// <summary>
+        /// Reads and validates single log file value. 
+        /// </summary>
         private void SubmitLogFile()
         {
             // Grab single log file and check it exists
@@ -444,6 +524,11 @@ namespace WebtrendsLogFilePro
             UpdateUIForValidLogFile();
         }
 
+        /// <summary>
+        /// Check that source log file is actually a Webtrends log file. 
+        /// </summary>
+        /// <param name="filePath">Log file path from UI</param>
+        /// <returns>true, if the log file is valid</returns>
         private bool IsValidLogFile(string filePath)
         {
             var result = false;
@@ -476,6 +561,9 @@ namespace WebtrendsLogFilePro
             return result;
         }
 
+        /// <summary>
+        /// Log file is valid so run through some steps to update UI.
+        /// </summary>
         private void UpdateUIForValidLogFile()
         {
             ResetUIForNewFile();
@@ -489,6 +577,10 @@ namespace WebtrendsLogFilePro
 
         #region File Stats Worker
 
+        /// <summary>
+        /// Takes valid logfile and gathers log file stats.
+        /// </summary>
+        /// <param name="logFile">valid log file path</param>
         private void SetFileStats(string logFile)
         {
             fileStatsWorker = new BackgroundWorker();
@@ -500,6 +592,21 @@ namespace WebtrendsLogFilePro
             fileStatsWorker.RunWorkerAsync();
         }
 
+        /// <summary>
+        /// FileStatsReader Worker Work task. Reads row count and file size.
+        /// </summary>
+        /// <param name="logFile">Valid log file path</param>
+        private void FileStatsDoWork(string logFile)
+        {
+            totalRows = File.ReadLines(logFile).Count();
+            fileSize = new FileInfo(logFile).Length;
+        }
+
+        /// <summary>
+        /// FileStatsReader Worker Competion task. Updates the UI with the newly acquired values.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FileStatsWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error != null) {
@@ -508,23 +615,14 @@ namespace WebtrendsLogFilePro
                 // Cancelled
             } else {
                 // Success
+                lbl_TotalRowsValue.Text = totalRows.ToString();
+                lbl_FileSizeValue.Text = (fileSize / 1024 / 1024).ToString();
+                SetOutputUIElements(true);
             }
 
             StartWaiting(false);
 
-            lbl_TotalRowsValue.Text = totalRows.ToString();
-            lbl_FileSizeValue.Text = (fileSize / 1024 / 1024).ToString();
-
             fileStatsWorker.Dispose();
-
-            // Enable UI Elements
-            SetOutputUIElements(true);
-        }
-
-        private void FileStatsDoWork(string logFile)
-        {
-            totalRows = File.ReadLines(logFile).Count();
-            fileSize = new FileInfo(logFile).Length;
         }
 
         #endregion
@@ -533,45 +631,59 @@ namespace WebtrendsLogFilePro
 
         #region Query Param Functions
 
+        /// <summary>
+        /// Look through the log file and find query parameters available for selection.
+        /// </summary>
+        /// <param name="method">Single, Quick or Full.</param>
+        /// <param name="logFile">Log file path. Kept as param so unit testing is easier.</param>
+        /// <returns></returns>
         public List<string> FindQueryParams(FindQueryParamsSpeed method, string logFile)
         { 
             var result = new List<string>();
 
+            // We continuously build up this hashset of query parameters, only adding new values to it.
             var queryParamsHash = new HashSet<string>();
 
-            switch (method) {                
+            switch (method) {
+
+                // Reads second line only. First line is the headers.                
                 case FindQueryParamsSpeed.Single:
-
                     File.ReadLines(logFile).Take(2).ToList().ForEach(x => queryParamsHash.UnionWith(ParseLineForQueryParamKeys(x)));
-
                     break;
+
+                // Reads top 5% lines. Does this on single thread.
                 case FindQueryParamsSpeed.Quick:
                     int totalRows = int.Parse(lbl_TotalRowsValue.Text);
                     int fivePercent = totalRows / 20;
                     int linesToParse = (fivePercent > 0) ? fivePercent : 2;
-
                     File.ReadLines(logFile).Take(linesToParse).ToList().ForEach(x => queryParamsHash.UnionWith(ParseLineForQueryParamKeys(x)));
-
                     break;
-                case FindQueryParamsSpeed.Full:
 
+                // Reads all lines. Uses Parralel to make this super fast and proper sick yo.
+                case FindQueryParamsSpeed.Full:
                     Parallel.ForEach(File.ReadLines(logFile), (line, _, lineNumber) => {
                         queryParamsHash.UnionWith(ParseLineForQueryParamKeys(line));
                     });
-
                     break;
             }
 
+            // Clean up found query params and sort.
             result = queryParamsHash.Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             result.Sort();
 
             return result;
         }
 
+        /// <summary>
+        /// Parses a single log file file for query parameters
+        /// </summary>
+        /// <param name="logFileLine">A log file line</param>
+        /// <returns>A list of found query params.</returns>
         public List<string> ParseLineForQueryParamKeys(string logFileLine)
         {
             var result = new List<string>();            
 
+            // Check it's not a header line. Could look into ways to remove header lines earlier perhaps.
             if(logFileLine[0] != '#') {
                 string[] logFileSplit = logFileLine.Split(' ');
                 if (logFileSplit.Length >= 7) {
@@ -583,6 +695,11 @@ namespace WebtrendsLogFilePro
             return result;
         }
 
+        /// <summary>
+        /// Setting up QueryParamsWorker for finding and updating UI for query params.
+        /// </summary>
+        /// <param name="speed">Single, Quick, Full</param>
+        /// <param name="logFile">Log File Path</param>
         public void FindAndSetQueryParamFields(FindQueryParamsSpeed speed, string logFile)
         {
             queryParamsWorker = new BackgroundWorker();
@@ -594,11 +711,21 @@ namespace WebtrendsLogFilePro
             queryParamsWorker.RunWorkerAsync();
         }
 
+        /// <summary>
+        /// QueryParamsWorker Work task. Finds the Query Params and adds to global params object.
+        /// </summary>
+        /// <param name="speed">Single, Quick, Full</param>
+        /// <param name="logFile">Log file path</param>
         private void QueryParamsWorkerDoWork(FindQueryParamsSpeed speed, string logFile)
         {
             AddToGlobalQueryParams(FindQueryParams(speed, logFile));
         }
 
+        /// <summary>
+        /// QueryParamsWorker completed task. Updates UI to include newly found query params.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void QueryParamsWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (e.Error != null) {
@@ -611,8 +738,13 @@ namespace WebtrendsLogFilePro
             }
 
             StartWaiting(false);
+
+            queryParamsWorker.Dispose();
         }
 
+        /// <summary>
+        /// Clears query params values from UI. Adds recently updated list.
+        /// </summary>
         private void RefreshQueryParamsUI()
         {
             // Clear existing nodes.
@@ -633,6 +765,10 @@ namespace WebtrendsLogFilePro
             lbl_QueryParamsValue.Text = globalQueryParams.Count.ToString();
         }
 
+        /// <summary>
+        /// Adds "newParams" to existing list of query params.
+        /// </summary>
+        /// <param name="newParams">New Query Params</param>
         private void AddToGlobalQueryParams(List<string> newParams)
         {
             // Get existing nodes
@@ -650,6 +786,9 @@ namespace WebtrendsLogFilePro
             globalQueryParams.AddRange(newParams.Distinct());
         }
 
+        /// <summary>
+        /// When entering query params manually, this function reads UI and adds valid input to query params object and UI.
+        /// </summary>
         private void AddQueryParamsFromUI()
         {
             string queryParams = txt_AddQueryParams.Text;
@@ -667,9 +806,50 @@ namespace WebtrendsLogFilePro
 
         #endregion
 
-        #region Core Processing Functions
+        #region Output Functions
 
-        private void StartParsingProcess()
+        /// <summary>
+        /// Finds Output file Directory.
+        /// </summary>
+        private void LocateOutputDir()
+        {
+            LocateAndUpdateUI(ShowOpenFolderDialog, txt_OutputDir);
+        }
+
+        /// <summary>
+        /// Sets the decode logic based on UI option selected. Faster than performing an if for each line.
+        /// </summary>
+        private void SetDecoder()
+        {
+            if (rdio_Decode_0.Checked) {
+                decode = delegate (string encodeVar) { return encodeVar; };
+            } else if (rdio_Decode_1.Checked) {
+                decode = delegate (string encodeVar) { return Uri.UnescapeDataString(encodeVar).Replace(Environment.NewLine, " "); };
+            } else if (rdio_Decode_2.Checked) {
+                decode = delegate (string encodeVar) { return Uri.UnescapeDataString(Uri.UnescapeDataString(encodeVar)).Replace(Environment.NewLine, " "); };
+            } else {
+                decode = delegate (string encodeVar) { return encodeVar; };
+            }
+        }
+
+        /// <summary>
+        /// Sets the join logic based on if quotes and output type selected. Faster than an if for each line.
+        /// </summary>
+        private void SetJoinedLogic()
+        {
+            if (chk_Quotes.Checked) {
+                joinQueryParams = delegate (string[] queryParamArray) { return string.Join("\"" + delimiter + "\"", queryParamArray); };
+                joinParsedLine = delegate (string[] lineColumnArray) { return "\"" + string.Join("\"" + delimiter + "\"", lineColumnArray) + "\""; };
+            } else {
+                joinQueryParams = delegate (string[] queryParamArray) { return string.Join(delimiter, queryParamArray); };
+                joinParsedLine = delegate (string[] lineColumnArray) { return string.Join(delimiter, lineColumnArray); };
+            }
+        }
+
+        /// <summary>
+        /// Validate input/ouput config options. Collect required values. Start Log File Worker.
+        /// </summary>
+        private void BuildOutputFile()
         {
             // Gather fields. Validate.
             var selectedNodes = treeView_fields.Nodes[0].Nodes.Cast<TreeNode>()
@@ -681,70 +861,51 @@ namespace WebtrendsLogFilePro
                 ShowErrorBox("No Fields Selected!");
                 return;
             }
-
             if(!File.Exists(validLogFile)) {
                 ShowErrorBox("Log File Doesn't Exist!");
                 return;
             }
-
             if(string.IsNullOrEmpty(txt_OutputFilename.Text.Trim())) {
                 ShowErrorBox("Invalid Output Filename!");
                 return;
             }
-
-            if(!Directory.Exists(txt_outputDir.Text)) {
+            if(!Directory.Exists(txt_OutputDir.Text)) {
                 ShowErrorBox("Invalid Output Directory!");
                 return;
             }
 
+            // Gather node values
             int[] selectedNodeIndexes = selectedNodes.Select(x => x.Index).ToArray();
-
             string[] selectedNodeHeaders = selectedNodes.Select(x => x.displayName).ToArray();
-
             string[] selectedQueryParameters = queryParamNode.Nodes.Cast<TreeNode>()
                 .Where(x => x.Checked)
                 .Select(y => y.Text)
                 .ToArray();
-
             string[] selectedGeoParameters = geoParamNode.Nodes.Cast<TreeNode>()
                 .Where(x => x.Checked)
                 .Select(y => y.Text)
                 .ToArray();
+            int selectedTypeIndex = cmb_outputFormat.SelectedIndex;
 
-            var selectedTypeIndex = cmb_outputFormat.SelectedIndex;
-
+            // Set up Log File Worker
             InitLogFileWorker(selectedTypeIndex, selectedNodeIndexes, selectedNodeHeaders, selectedQueryParameters, selectedGeoParameters, validLogFile);
 
+            // Prepare UI for Log File Worker task
             InitProgressBox();
-
             StartWaiting(true);
 
             logFileWorker.RunWorkerAsync();
         }
 
-        private void InitProgressBox()
-        {
-            lbl_ParsedRowsValue.Text = "0";
-            lbl_TimeElapsedValue.Text = "00:00:00";
-            lbl_CompletionValue.Text = "0%";
-
-            timer = new Timer();
-            timer.Interval = (50); // 0.05 second
-            timer.Tick += new EventHandler(Timer_Tick);
-
-            stopWatch = new Stopwatch();
-
-            stopWatch.Start();
-            timer.Start();
-        }
-
-        private void Timer_Tick(object sender, EventArgs e)
-        {
-            lbl_ParsedRowsValue.Text = parsedLines.ToString();
-            lbl_CompletionValue.Text = ((double)parsedLines / totalRows).ToString("#.##%");
-            lbl_TimeElapsedValue.Text = stopWatch.Elapsed.ToString("hh\\:mm\\:ss");
-        }
-
+        /// <summary>
+        /// Sets up Log File Worker tasks.
+        /// </summary>
+        /// <param name="outputType">Output file type. Could use global object here, but better for future unit tests if left as param.</param>
+        /// <param name="selectedNodeIndexes">The log file column index values which have been selected.</param>
+        /// <param name="selectedNodeHeaders">The log file column header values which have been selected.</param>
+        /// <param name="selectedQueryParameters">The query parameter values which have been selected.</param>
+        /// <param name="selectedGeoParameters">The geo parameter values which have been selected.</param>
+        /// <param name="logFile">The log file.</param>
         private void InitLogFileWorker(int outputType, int[] selectedNodeIndexes, string[] selectedNodeHeaders, string[] selectedQueryParameters, string[] selectedGeoParameters, string logFile)
         {
             logFileWorker = new BackgroundWorker();
@@ -753,33 +914,20 @@ namespace WebtrendsLogFilePro
                 case 0:
                     logFileWorker.DoWork += (obj, e) => CreateTABFile(obj, selectedNodeIndexes, selectedNodeHeaders, selectedQueryParameters, selectedGeoParameters, validLogFile);
                     break;
-                case 1:
-                    logFileWorker.DoWork += (obj, e) => CreateJSONFile(obj, selectedNodeIndexes, selectedNodeHeaders, selectedQueryParameters, selectedGeoParameters, validLogFile);
-                    break;
             }
 
             logFileWorker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(logFileWorkerCompleted);
         }
 
-        private void logFileWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            if (e.Error != null) {
-                ShowErrorBox("Error Occured while Parsing File. Reached Line " + parsedLines + "\n\n" + e.Error.Message);
-            } else if (e.Cancelled) {
-                // Cancelled
-            } else {
-                // Success
-                lbl_ParsedRowsValue.Text = parsedLines.ToString();
-                lbl_CompletionValue.Text = "100%";
-                OpenFileButtonsVisible(true);
-            }
-
-            stopWatch.Stop();
-            timer.Stop();
-            
-            StartWaiting(false);
-        }
-
+        /// <summary>
+        /// Creates a tab file from a source log file, selected fields and query parameters.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="selectedNodeIndexes">The log file column index values which have been selected.</param>
+        /// <param name="selectedNodeHeaders">The log file column header values which have been selected.</param>
+        /// <param name="selectedQueryParameters">The query parameter values which have been selected.</param>
+        /// <param name="selectedGeoParameters">The geo parameter values which have been selected.</param>
+        /// <param name="logFile">The log file.</param>
         private void CreateTABFile(object sender, int[] selectedNodeIndexes, string[] selectedNodeHeaders, string[] selectedQueryParameters, string[] selectedGeoParameters, string logFile)
         {
             BackgroundWorker worker = sender as BackgroundWorker;            
@@ -799,17 +947,22 @@ namespace WebtrendsLogFilePro
             string csvHeaders = string.Join(delimiter, csvHeadersArray);
             int headersLength = csvHeaders.Length;
 
-            outputDir = txt_outputDir.Text;
+            // Create output file
+            outputDir = txt_OutputDir.Text;
             var outputFilename = txt_OutputFilename.Text;
             outputFile = outputDir + "\\" + outputFilename + ".tab";
 
-            parsedLines = 0;
-            string line;
-
+            // Create output file if it doesn't exist.
             if (!File.Exists(outputFile)) {
                 File.Create(outputFile).Dispose();
             }
 
+            // Set up variables to be used during task.
+            parsedLines = 0;
+            string line;
+
+            // Open a file reader and writer, reads and writes one line at a time 
+            // (limited by disk io speeds so parallel wouldn't help - unless entire file written into memory, which isn't gonna happen)
             using (StreamReader sr = new StreamReader(logFile)) {
                 using (StreamWriter sw = new StreamWriter(outputFile, false)) {
                     sw.WriteLine(csvHeaders);
@@ -825,12 +978,21 @@ namespace WebtrendsLogFilePro
             }
         }
 
+        /// <summary>
+        /// Parses a single log file line and outputs in tab format. 
+        /// </summary>
+        /// <param name="line">the log file line.</param>
+        /// <param name="selectedNodeIndexes">The log file column index values which have been selected.</param>
+        /// <param name="selectedQueryParameters">The query parameter values which have been selected.</param>
+        /// <param name="selectedGeoParameters">The geo parameter values which have been selected.</param>
+        /// <returns>Log file line in tab format.</returns>
         private string ParseLineForTAB(string line, int[] selectedNodeIndexes, string[] selectedQueryParameters, string[] selectedGeoParameters)
         {
             string result = "";
 
             string[] resultArray = new string[selectedNodeIndexes.Length];
 
+            // Ignore header lines. Again, if removed earlier, could speed this process up potentially. 
             if (line[0] != '#') {
 
                 string[] splitLine = line.Split(' ');
@@ -840,12 +1002,17 @@ namespace WebtrendsLogFilePro
                     for (int i = 0; i < selectedNodeIndexes.Length; i++) {
                         int splitLineIndex = selectedNodeIndexes[i];
                         switch (splitLineIndex) {
-                            case 7: // Query Param Index
-                                resultArray[i] = ParseLineForQueryParams(splitLine[splitLineIndex], selectedQueryParameters);
+                            // Query Param Index
+                            case 7:
+                                resultArray[i] = GetSelectedQueryParamValues(splitLine[splitLineIndex], selectedQueryParameters);
                                 break;
-                            case 14: // Geo Param Index
-                                resultArray[i] = ParseLineForQueryParams(splitLine[splitLineIndex], selectedGeoParameters);
+
+                            // Geo Param Index
+                            case 14: 
+                                resultArray[i] = GetSelectedQueryParamValues(splitLine[splitLineIndex], selectedGeoParameters);
                                 break;
+
+                            // Just a basic field, no parsing required.
                             default:
                                 resultArray[i] = splitLine[splitLineIndex];
                                 break;
@@ -854,12 +1021,20 @@ namespace WebtrendsLogFilePro
                 }
             }
 
+            // Decodes and Joins line. Depending on decode type selected, this will return different values.
+            // Join is determined by if quotes are enabled, and on output type selected.
             result = decode(joinParsedLine(resultArray));
 
             return result;
         }
 
-        public string ParseLineForQueryParams(string queryParamsBlock, string[] selectedQueryParameters)
+        /// <summary>
+        /// Given a list of "selected" query params, and a query param block, returns the values for the selected query params.
+        /// </summary>
+        /// <param name="queryParamsBlock"></param>
+        /// <param name="selectedQueryParameters"></param>
+        /// <returns></returns>
+        public string GetSelectedQueryParamValues(string queryParamsBlock, string[] selectedQueryParameters)
         {
             string result = "";
 
@@ -873,28 +1048,49 @@ namespace WebtrendsLogFilePro
                 resultArray[i] = allQueryStringsInLine.Get(selectedQueryParameters[i]);
             }
 
+            // Join is determined by if quotes are enabled, and on output type selected.
             result = joinQueryParams(resultArray);
 
             return result;
         }
 
-        private void CreateJSONFile(object sender, int[] selectedNodeIndexes, string[] selectedNodeHeaders, string[] selectedQueryParameters, string[] selectedGeoParameters, string logFile)
+        /// <summary>
+        /// LogFileWorker completed task. Shows Excel/Explorer buttons.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void logFileWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            return;
+            if (e.Error != null) {
+                ShowErrorBox("Error Occured while Parsing File. Reached Line " + parsedLines + "\n\n" + e.Error.Message);
+            } else if (e.Cancelled) {
+                // Cancelled
+            } else {
+                // Success
+                lbl_ParsedRowsValue.Text = parsedLines.ToString();
+                lbl_CompletionValue.Text = "100%";
+                OpenFileButtonsVisible(true);
+            }
+
+            stopWatch.Stop();
+            timer.Stop();
+
+            StartWaiting(false);
         }
 
-        #endregion
 
-        #region Open File Functions
 
+        /// <summary>
+        /// Launches Excel and opens newly created output file.
+        /// </summary>
         private void OpenLogFileWithExcel()
         {
             try {
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = "Excel";
-                startInfo.Arguments = "\"" + outputFile + "\"";
+                startInfo.Arguments = outputFile;
                 Process.Start(startInfo);
-            } catch(Exception e) {
+            } catch (Exception e) {
                 ShowErrorBox("Error while opening Excel. Is it installed? \n" + e.Message);
             }
         }
@@ -905,6 +1101,12 @@ namespace WebtrendsLogFilePro
 
         #region Helper Functions
 
+        /// <summary>
+        /// Opens a File Selector dialog.
+        /// </summary>
+        /// <param name="initFile">Starting file.</param>
+        /// <param name="filter">File filter</param>
+        /// <returns>Selected filename.</returns>
         private string ShowOpenFileDialog(string initFile, string filter)
         {
             string result = null;
@@ -932,6 +1134,12 @@ namespace WebtrendsLogFilePro
             return result;
         }
 
+        /// <summary>
+        /// Opens a Folder Selector dialog.
+        /// </summary>
+        /// <param name="startDir">Starting Directory.</param>
+        /// <param name="filter">Folder Filter. Kept so this can be used in a generic way along with "ShowOpenFileDialog"</param>
+        /// <returns>Selected Folder</returns>
         private string ShowOpenFolderDialog(string startDir, string filter = "")
         {
             string result = null;
@@ -961,116 +1169,78 @@ namespace WebtrendsLogFilePro
             return result;
         }
 
-        private void Print(object text)
-        {
-            Console.Out.WriteLine(text);
-        }
-
+        /// <summary>
+        /// Perform a process and wait for exit.
+        /// </summary>
+        /// <param name="psi"></param>
         private void ExecuteSystemProcess(ProcessStartInfo psi)
         {
             Process process = Process.Start(psi);
             process.WaitForExit();
         }
 
+        /// <summary>
+        /// Display an error dialogue with an error message.
+        /// </summary>
+        /// <param name="message"></param>
         private void ShowErrorBox(string message)
         {
             MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
+        /// <summary>
+        /// A task is running, so the UI should be "waiting". Disable buttons and UI elements.
+        /// </summary>
+        /// <param name="showWait"></param>
         private void StartWaiting(bool showWait)
         {
             tasksRunning = showWait ? tasksRunning + 1 : tasksRunning - 1;
 
             if (tasksRunning == 1) {
                 Cursor = Cursors.WaitCursor;
-                SetButtonsEnabled(false);
+                SetUIEnabledForWaiting(false);
             } else if (tasksRunning == 0) {
                 Cursor = Cursors.Default;
-                SetButtonsEnabled(true);
+                SetUIEnabledForWaiting(true);
             }
         }
 
-        private void SetButtonsEnabled(bool enabled)
+        /// <summary>
+        /// Sets all interactable UI elements enabled/disabled mainly for waiting. Proabably a bit overkill, could be neater.
+        /// </summary>
+        /// <param name="enabled">Enabled or narr</param>
+        private void SetUIEnabledForWaiting(bool enabled)
         {
-            btn_AddQueryParams.Enabled = enabled;
             btn_ExtractLogFiles.Enabled = enabled;
             btn_FullScan.Enabled = enabled;
             btn_GzFileDirectory.Enabled = enabled;
             btn_QuickScan.Enabled = enabled;
             btn_SevenZip.Enabled = enabled;
-            btn_singleLogFile.Enabled = enabled;
-            btn_start.Enabled = enabled;
-            btn_submitSingleLogFile.Enabled = enabled;
+            btn_SingleLogFile.Enabled = enabled;
+            btn_Start.Enabled = enabled;            
+            btn_SubmitSingleLogFile.Enabled = enabled;
+            btn_OutputDir.Enabled = enabled;
+            btn_AddQueryParams.Enabled = enabled;
             btn_Excel.Enabled = enabled;
             btn_Explorer.Enabled = enabled;
+
+            txt_AddQueryParams.Enabled = enabled;
+            txt_GzFileDirectory.Enabled = enabled;
+            txt_SevenZipFile.Enabled = enabled;
+            txt_SingleLogFile.Enabled = enabled;
+            txt_OutputDir.Enabled = enabled;
+            txt_OutputFilename.Enabled = enabled;
+
+            rdio_Decode_0.Enabled = enabled;
+            rdio_Decode_1.Enabled = enabled;
+            rdio_Decode_2.Enabled = enabled;
+
+            cmb_outputFormat.Enabled = enabled;
+
+            chk_Quotes.Enabled = enabled;
         }
 
         #endregion
-
-        private void rdio_Decode_CheckedChanged(object sender, EventArgs e)
-        {
-            SetDecoder();
-        }
-
-        private void SetDecoder()
-        {
-            if (rdio_Decode_0.Checked) {
-                decode = delegate (string encodeVar) { return encodeVar; };
-            } else if (rdio_Decode_1.Checked) {
-                decode = delegate (string encodeVar) { return Uri.UnescapeDataString(encodeVar).Replace(Environment.NewLine, " "); };
-            } else if (rdio_Decode_2.Checked) {
-                decode = delegate (string encodeVar) { return Uri.UnescapeDataString(Uri.UnescapeDataString(encodeVar)).Replace(Environment.NewLine, " "); };
-            } else {
-                decode = delegate (string encodeVar) { return encodeVar; };
-            }
-        }
-
-        private void chk_Quotes_CheckedChanged(object sender, EventArgs e)
-        {
-            SetJoinedLogic();
-        }
-
-        private void SetJoinedLogic()
-        {
-            if(chk_Quotes.Checked) {
-                joinQueryParams = delegate (string[] queryParamArray) { return string.Join("\"" + delimiter + "\"", queryParamArray); };
-                joinParsedLine = delegate (string[] lineColumnArray) { return "\"" + string.Join("\"" + delimiter + "\"", lineColumnArray) + "\""; };
-            } else {
-                joinQueryParams = delegate (string[] queryParamArray) { return string.Join(delimiter, queryParamArray); };
-                joinParsedLine = delegate (string[] lineColumnArray) { return string.Join(delimiter, lineColumnArray); };
-            }
-        }
-
-        private void btn_Explorer_Click(object sender, EventArgs e)
-        {
-            Process.Start(Path.GetDirectoryName(outputFile));
-        }
-
-        private void btn_outputDir_Click(object sender, EventArgs e)
-        {
-            LocateOutputDir();
-        }
-
-        private void LocateOutputDir()
-        {
-            LocateAndUpdateUI(ShowOpenFolderDialog, txt_outputDir);
-        }
-
-        private void treeView_fields_KeyPress(object sender, KeyEventArgs e)
-        {
-            // if there is a currently selected node
-            var selectedNode = treeView_fields.SelectedNode;
-
-            if(selectedNode != null) {
-                // if the Enter key was pressed
-                if (e.KeyCode == Keys.Enter) {
-                    selectedNode.Checked = !selectedNode.Checked;
-                    e.Handled = true;
-                    e.SuppressKeyPress = true;
-                }
-            }
-        }
-
 
     }
 }
