@@ -23,7 +23,7 @@ namespace WebtrendsLogFilePro
                 + "How to Use WebtrendsLogFilePro" + System.Environment.NewLine
                 + "---------------------------------------------------------------------------------------------------------------------------------------------" + System.Environment.NewLine
                 + "" + System.Environment.NewLine
-                + "1. Select either a directory containing compressed log files in gz formet or a single log file. The extraction requires that you have 7z.exe on your machine, and that the filepath shown in the UI is correct. The single log file chosen can be many smaller log files merged into on file, the additional header rows are removed during the parsing process." + System.Environment.NewLine
+                + "1. Select either a directory containing compressed log files in gz format or a single log file. The extraction requires that you have 7z.exe on your machine, and that the filepath shown in the UI is correct. The single log file chosen can be many smaller log files merged into on file, the additional header rows are removed during the parsing process." + System.Environment.NewLine
                 + "" + System.Environment.NewLine
                 + "2. If a directory is chosen, click \"Extract\" which will extract the files and create a single log file which will populate the \"Single Log File\" box. This process may take a while if the compressed log files are large in size. There was no way to show a progress bar for this unfortunately! " + System.Environment.NewLine
                 + "" + System.Environment.NewLine

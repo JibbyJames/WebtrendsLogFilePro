@@ -1088,7 +1088,7 @@ namespace WebtrendsLogFilePro
             try {
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = "Excel";
-                startInfo.Arguments = outputFile;
+                startInfo.Arguments = "\"" + outputFile + "\"";
                 Process.Start(startInfo);
             } catch (Exception e) {
                 ShowErrorBox("Error while opening Excel. Is it installed? \n" + e.Message);
